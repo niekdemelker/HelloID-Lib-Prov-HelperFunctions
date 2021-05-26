@@ -1,60 +1,65 @@
+// This function generates names like:
+// john.doe@domain.com
+// j.doe@domain.com
+// j.doe1@domain.com
+// j.doe2@domain.com
+// j.doe3@domain.com
+// etc
 function generateSamAccountName() {
-    const suffix = Iteration === 0 ? '' : Iteration;
-    let maxAttributeLength = 20 - suffix.toString().length;
-    
-    let firstNameChar = Person.Name.NickName.substring(0, 1);
+
+    const suffix = Iteration <= 1 ? '' : Iteration;
+    const maxAttributeLength = 20 - suffix.toString().length;
+
     let firstName = Person.Name.NickName;
     let middleName = Person.Name.FamilyNamePrefix;
     let lastName = Person.Name.FamilyName;
-    
-    let sAMAccountName = "";
-    
-    if (Iteration == 0)
-    {
-        sAMAccountName = firstName + '.';
-        //Check if the middleName variable contains data
-        if (typeof middleName !== 'undefined' && middleName) { sAMAccountName = sAMAccountName + middleName.replace(/\s+/g, '.') + '.' }
-        sAMAccountName = sAMAccountName + lastName;
-        
-        sAMAccountName = sAMAccountName.trim().substring(0, 20);
+
+    if (Iteration == 0) {
+        let sAMAccountName = [firstName, middleName, lastName]
+            // Filter empty values
+            .filter(function(x) {return x && x !== ''})
+            // Join values to single string
+            .join(' ')
+            // Change whitespaces to dots
+            .replace(/\s+/g, '.')
+            // Take the first twenty characters
+            .substring(0, 20);
     }
-    
-    if (Iteration == 1)
-    {
-        sAMAccountName = firstNameChar + '.';
-        //Check if the middleName variable contains data
-        if (typeof middleName !== 'undefined' && middleName) { sAMAccountName = sAMAccountName + middleName.replace(/\s+/g, '.') + '.' }
-        sAMAccountName = sAMAccountName + lastName;
-        
-        sAMAccountName = sAMAccountName.trim().substring(0, 20);
+
+    else if (Iteration == 1) {
+        let sAMAccountName = [firstName.substring(0, 1), middleName, lastName]
+            // Filter empty values
+            .filter(function(x) {return x && x !== ''})
+            // Join values to single string
+            .join(' ')
+            // Change whitespaces to dots
+            .replace(/\s+/g, '.')
+            // Take the first twenty characters
+            .substring(0, 20);
     }
-    
-    if (Iteration >= 2)
-    {
-        sAMAccountName = firstNameChar + '.';
-        //Check if the middleName variable contains data
-        if (typeof middleName !== 'undefined' && middleName) { sAMAccountName = sAMAccountName + middleName.replace(/\s+/g, '.') + '.' }
-        sAMAccountName = sAMAccountName + lastName;
-        
-        sAMAccountName = sAMAccountName.trim().substring(0, maxAttributeLength) + suffix;
+
+    else {
+        let sAMAccountName = [firstName.substring(0, 1), middleName, lastName]
+            // Filter empty values
+            .filter(function(x) {return x && x !== ''})
+            // Join values to single string
+            .join(' ')
+            // Change whitespaces to dots
+            .replace(/\s+/g, '.')
+            // Take the first twenty characters
+            .substring(0, maxAttributeLength)
+            // Append the suffix
+            .concat(suffix);
     }
-    
-    //Remove tailing ...
-    sAMAccountName = sAMAccountName.replace(/\.+$/, "");
 
-    //Remove leading ...
-    sAMAccountName = sAMAccountName.replace(/^\.+/, "");
+    // Remove diacritical chars
+    sAMAccountName = deleteDiacriticalMarks(sAMAccountName)
+        // Convert to lower case
+        .toLowerCase()
+        // Remove specific characters
+        .replace(/[^0-9a-zA-Z.']/g, '');
 
-    //Convert to lower case
-    sAMAccountName = sAMAccountName.toLowerCase();
-
-    //Remove diacritical chars
-    sAMAccountName = deleteDiacriticalMarks(sAMAccountName);
-
-    //Remove specific chars    
-    sAMAccountName = sAMAccountName.replace(/[^0-9a-zA-Z.']/g, '');
-
-  return sAMAccountName;
+    return sAMAccountName;
 }
 
 generateSamAccountName();

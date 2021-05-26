@@ -1,28 +1,31 @@
 // Please enter the mapping logic to generate the primaryMailAddress.
 function generateMailAddress(firstName, middleName, lastName) {
+
     const suffix = Iteration === 0 ? '' : Iteration;
     
     let mailAddress = [firstName, middleName, lastName]
         // Filter empty values
-        .filter(function(x) {return x !== ""})
+        .filter(function(x) {return x && x !== ''})
         // Join values to single string
         .join(' ')
-        //Change whitespaces to dots
+        // Change whitespaces to dots
         .replace(/\s+/g, '.')
-        //Convert to lower case
+        // Convert to lower case
         .toLowerCase();
 
-    //Remove diacritical chars
-    mailAddress = deleteDiacriticalMarks(mailAddress);
-    
-    //Remove all but specified chars   
-    mailAddress = mailAddress.replace(/[^0-9a-zA-Z.']/g, '');
+    // Remove diacritical chars
+    mailAddress = deleteDiacriticalMarks(mailAddress)
+        // Remove all but specified chars   
+        .replace(/[^0-9a-zA-Z.']/g, '')
+        // Append Suffix
+        .concat(suffix);
 
-    return mailAddress + suffix;
+    return mailAddress;
 }
 
-function getValue() {
-    const domain = 'yourdomainhere';
+function generateProxyAddresses() {
+
+    const domain = 'domain.com';
     
     let mailAddress = generateMailAddress(
         Person.Name.NickName,
@@ -30,8 +33,8 @@ function getValue() {
         Person.Name.FamilyName
     );
     
-    if (["P", "PB"].indexOf(Person.Name.Convention) >= 0) {
-        const primaryMailAddress = generateMailAddress(
+    if (['P', 'PB'].indexOf(Person.Name.Convention) >= 0) {
+        let primaryMailAddress = generateMailAddress(
             Person.Name.NickName,
             Person.Name.FamilyNamePartnerPrefix,
             Person.Name.FamilyNamePartner
@@ -40,12 +43,12 @@ function getValue() {
         return [
             'SMTP:' + primaryMailAddress + '@' + domain,
             'smtp:' + mailAddress + '@' + domain
-        ]
+        ];
     }
 
     return [
         'SMTP:' + mailAddress + '@' + domain
-    ]
+    ];
 }
 
-getValue();
+generateProxyAddresses();
